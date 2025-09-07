@@ -20,6 +20,7 @@ import { Loader2 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { analyzeUrl } from '@/app/actions';
 import Image from 'next/image';
+import DashboardLayout from './dashboard/layout';
 
 const formSchema = z.object({
   url: z.string().min(1, { message: "Please enter a URL." }),
@@ -74,49 +75,51 @@ export default function SmartInspectPage() {
     }
 
     return (
-        <div className="flex flex-col items-center justify-center h-full text-center p-4">
-            <div className="max-w-2xl w-full">
-                 <div className="mb-4 flex justify-center">
-                    <Image src="https://fonts.gstatic.com/s/e/notoemoji/latest/1f52d/512.webp" alt="Telescope" width={80} height={80} />
-                </div>
-                <h1 className="text-4xl font-bold tracking-tight mb-4">
-                    Website Performance Analysis
-                </h1>
-                <p className="text-muted-foreground mb-8">
-                    Enter a URL to analyze your website's performance and get optimization insights.
-                </p>
+        <DashboardLayout>
+            <div className="flex flex-col items-center justify-center h-full text-center p-4">
+                <div className="max-w-2xl w-full">
+                    <div className="mb-4 flex justify-center">
+                        <Image src="https://fonts.gstatic.com/s/e/notoemoji/latest/1f52d/512.webp" alt="Telescope" width={80} height={80} />
+                    </div>
+                    <h1 className="text-4xl font-bold tracking-tight mb-4">
+                        Website Performance Analysis
+                    </h1>
+                    <p className="text-muted-foreground mb-8">
+                        Enter a URL to analyze your website's performance and get optimization insights.
+                    </p>
 
-                <Card>
-                    <CardContent className="p-6">
-                        <Form {...form}>
-                            <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col sm:flex-row items-start gap-2">
-                                <FormField
-                                    control={form.control}
-                                    name="url"
-                                    render={({ field }) => (
-                                        <FormItem className="w-full text-left">
-                                            <FormControl>
-                                                <Input placeholder="example.com" {...field} />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                                <Button type="submit" disabled={isLoading} className="w-full sm:w-auto">
-                                    {isLoading ? (
-                                        <>
-                                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                            Analyzing...
-                                        </>
-                                    ) : (
-                                        'Analyze'
-                                    )}
-                                </Button>
-                            </form>
-                        </Form>
-                    </CardContent>
-                </Card>
+                    <Card>
+                        <CardContent className="p-6">
+                            <Form {...form}>
+                                <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col sm:flex-row items-start gap-2">
+                                    <FormField
+                                        control={form.control}
+                                        name="url"
+                                        render={({ field }) => (
+                                            <FormItem className="w-full text-left">
+                                                <FormControl>
+                                                    <Input placeholder="example.com" {...field} />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                    <Button type="submit" disabled={isLoading} className="w-full sm:w-auto">
+                                        {isLoading ? (
+                                            <>
+                                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                                Analyzing...
+                                            </>
+                                        ) : (
+                                            'Analyze'
+                                        )}
+                                    </Button>
+                                </form>
+                            </Form>
+                        </CardContent>
+                    </Card>
+                </div>
             </div>
-        </div>
+        </DashboardLayout>
     );
 }

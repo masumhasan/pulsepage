@@ -8,6 +8,7 @@ import { Code, File, FileCode, Image as ImageIcon, Trash2, Copy, AlertCircle, Ch
 import { Badge } from "@/components/ui/badge";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { cn } from "@/lib/utils";
+import DashboardLayout from "./layout";
 
 
 const unusedFiles = [
@@ -141,7 +142,7 @@ function StatCard({ title, value, description, Icon }: StatCardProps) {
     )
 }
 
-export default function AssetOptimizerPage() {
+function AssetOptimizerPage() {
     const cssFiles = unusedFiles.filter(f => f.type === 'css');
     const jsFiles = unusedFiles.filter(f => f.type === 'js');
     const imageFiles = unusedFiles.filter(f => f.type === 'img');
@@ -304,5 +305,13 @@ function CodeBlockList() {
                 </AccordionItem>
             ))}
         </Accordion>
+    )
+}
+
+export default function Page() {
+    return (
+        <DashboardLayout>
+            <AssetOptimizerPage />
+        </DashboardLayout>
     )
 }

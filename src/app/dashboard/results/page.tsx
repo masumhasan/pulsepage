@@ -21,6 +21,7 @@ import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, LineChart, Line, AreaChart, Area, CartesianGrid } from 'recharts';
 import { Badge } from '@/components/ui/badge';
+import DashboardLayout from '../layout';
 
 
 function PerformanceScore({ score }: { score: number }) {
@@ -331,7 +332,7 @@ function WaterfallTabContent() {
         if (typeL !== 'all') {
             if (typeL === 'images') {
                 typeMatch = itemType === 'img';
-            } else if (resourceTypes.map(t => t.toLowerCase()).includes(typeL)) {
+            } else if (resourceTypes.slice(1).map(t => t.toLowerCase()).includes(typeL)) {
                 typeMatch = itemType === typeL;
             } else {
                  typeMatch = false;
@@ -874,10 +875,13 @@ function ResultsPageContent() {
 }
 
 
-export default function ResultsPage() {
+function ResultsPage() {
     return (
-        <Suspense fallback={<ResultsLoading />}>
-            <ResultsPageContent />
-        </Suspense>
+        <DashboardLayout>
+            <Suspense fallback={<ResultsLoading />}>
+                <ResultsPageContent />
+            </Suspense>
+        </DashboardLayout>
     )
 }
+export default ResultsPage;

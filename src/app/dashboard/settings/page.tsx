@@ -1,8 +1,9 @@
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import DashboardLayout from "../layout";
 
 export default function SettingsPage() {
     return (
-        <div>
+        <DashboardLayout>
             <h1 className="text-3xl font-bold mb-4">Settings</h1>
             <Card>
                 <CardHeader>
@@ -12,6 +13,6 @@ export default function SettingsPage() {
                     <p>This page is under construction.</p>
                 </CardContent>
             </Card>
-        </div>
+        </DashboardLayout>
     )
 }
