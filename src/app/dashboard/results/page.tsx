@@ -877,11 +877,9 @@ function ResultsPageContent() {
 
 function ResultsPage() {
     return (
-        <DashboardLayout>
-            <Suspense fallback={<ResultsLoading />}>
-                <ResultsPageContent />
-            </Suspense>
-        </DashboardLayout>
+        <Suspense fallback={<ResultsLoading />}>
+            <ResultsPageContent />
+        </Suspense>
     )
 }
 export default ResultsPage;
