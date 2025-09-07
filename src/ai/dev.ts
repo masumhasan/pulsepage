@@ -2,5 +2,4 @@
 import { config } from 'dotenv';
 config();
 
-import '@/ai/flows/detailed-optimization-reports.ts';
-import '@/ai/flows/unused-code-detection.ts';
+import '@/ai/flows/generate-website-report.ts';
