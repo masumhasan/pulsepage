@@ -13,6 +13,7 @@ import { Moon, Sun, Search, Settings, Bot, Zap } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
+import { PagePulseIcon } from '@/components/icons';
 
 function ThemeToggle() {
   const { setTheme } = useTheme();
@@ -79,11 +80,11 @@ export default function DashboardLayout({
       <header className="sticky top-0 z-40 flex h-16 items-center gap-4 border-b bg-background px-4 md:px-6">
         <nav className="hidden flex-col gap-6 text-lg font-medium md:flex md:flex-row md:items-center md:gap-5 md:text-sm lg:gap-6">
           <Link
-            href="#"
+            href="/dashboard/inspect"
             className="flex items-center gap-2 text-lg font-semibold md:text-base"
           >
-            <Zap className="h-6 w-6" />
-            <span className="sr-only">Asset Optimizer</span>
+            <PagePulseIcon className="h-6 w-6" />
+            <span className="">PagePulse</span>
           </Link>
           {navLinks.map((link) => (
             <NavLink key={link.href} {...link} />
