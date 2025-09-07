@@ -18,9 +18,8 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
-import { analyzeUrl } from '@/app/actions';
 import Image from 'next/image';
-import DashboardLayout from './dashboard/layout';
+import PageLayout from './page-layout';
 
 const formSchema = z.object({
   url: z.string().min(1, { message: "Please enter a URL." }),
@@ -75,7 +74,7 @@ export default function SmartInspectPage() {
     }
 
     return (
-        <DashboardLayout>
+        <PageLayout>
             <div className="flex flex-col items-center justify-center h-full text-center p-4">
                 <div className="max-w-2xl w-full">
                     <div className="mb-4 flex justify-center">
@@ -120,6 +119,6 @@ export default function SmartInspectPage() {
                     </Card>
                 </div>
             </div>
-        </DashboardLayout>
+        </PageLayout>
     );
 }

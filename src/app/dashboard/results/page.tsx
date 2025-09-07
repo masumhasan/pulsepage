@@ -21,7 +21,7 @@ import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, LineChart, Line, AreaChart, Area, CartesianGrid } from 'recharts';
 import { Badge } from '@/components/ui/badge';
-import DashboardLayout from '../layout';
+import PageLayout from '@/app/page-layout';
 
 
 function UnusedCodeAnalysis({ unusedCode }: { unusedCode: AnalysisResult['unusedCode'] }) {
@@ -746,7 +746,7 @@ function StructureTabContent({ data }: { data: AnalysisResult }) {
 
 function ResultsDisplay({ data }: { data: AnalysisResult }) {
     return (
-        <div className="space-y-6">
+        <div className="flex-1 flex-col gap-4 p-4 md:gap-8 md:p-8">
             <div>
                 <div className="flex items-center gap-2">
                     <h1 className="text-3xl font-bold">Analysis Results</h1>
@@ -755,7 +755,7 @@ function ResultsDisplay({ data }: { data: AnalysisResult }) {
                 <p className="text-muted-foreground break-all">For: <a href={data.url} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">{data.url}</a></p>
             </div>
             
-            <Tabs defaultValue="summary" className="w-full">
+            <Tabs defaultValue="summary" className="w-full mt-6">
               <TabsList className="grid w-full grid-cols-5">
                 <TabsTrigger value="summary">Summary</TabsTrigger>
                 <TabsTrigger value="performance">Performance</TabsTrigger>
@@ -858,10 +858,10 @@ function ResultsPageContent() {
 
 export default function ResultsPage() {
     return (
-        <DashboardLayout>
+        <PageLayout>
             <Suspense fallback={<ResultsLoading />}>
                 <ResultsPageContent />
             </Suspense>
-        </DashboardLayout>
+        </PageLayout>
     )
 }

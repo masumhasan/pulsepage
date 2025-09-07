@@ -6,11 +6,11 @@ import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Bot, User } from "lucide-react";
 import Image from 'next/image';
-import DashboardLayout from "../layout";
+import PageLayout from "@/app/page-layout";
 
 export default function AiAssistantPage() {
     return (
-        <DashboardLayout>
+        <PageLayout>
             <div className="flex flex-col h-full">
                 <div className="flex-1 overflow-y-auto p-4 space-y-4">
                     <div className="flex items-start gap-4">
@@ -44,6 +44,6 @@ export default function AiAssistantPage() {
                     </div>
                 </div>
             </div>
-        </DashboardLayout>
+        </PageLayout>
     )
 }

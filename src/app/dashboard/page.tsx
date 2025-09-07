@@ -8,7 +8,7 @@ import { Code, File, FileCode, Image as ImageIcon, Trash2, Copy, AlertCircle, Ch
 import { Badge } from "@/components/ui/badge";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { cn } from "@/lib/utils";
-import DashboardLayout from "./layout";
+import PageLayout from "../page-layout";
 
 
 const unusedFiles = [
@@ -148,7 +148,7 @@ function AssetOptimizerPage() {
     const imageFiles = unusedFiles.filter(f => f.type === 'img');
 
     return (
-        <div>
+        <div className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-8">
             <div className="flex items-center justify-between mb-4">
                 <div>
                     <h1 className="text-3xl font-bold">Asset Optimizer</h1>
@@ -310,8 +310,8 @@ function CodeBlockList() {
 
 export default function Page() {
     return (
-        <DashboardLayout>
+        <PageLayout>
             <AssetOptimizerPage />
-        </DashboardLayout>
+        </PageLayout>
     )
 }
