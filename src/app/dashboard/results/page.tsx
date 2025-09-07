@@ -327,14 +327,14 @@ function WaterfallTabContent() {
         const typeL = activeType.toLowerCase();
         const itemType = item.type.toLowerCase();
         let typeMatch = true;
-
-        if (activeType !== 'All') {
+        
+        if (typeL !== 'all') {
             if (typeL === 'images') {
                 typeMatch = itemType === 'img';
             } else if (resourceTypes.map(t => t.toLowerCase()).includes(typeL)) {
                 typeMatch = itemType === typeL;
             } else {
-                 typeMatch = itemType === typeL;
+                 typeMatch = false;
             }
         }
         
@@ -758,6 +758,8 @@ function ServerDetails() {
 }
 
 function ResultsDisplay({ data }: { data: AnalysisResult }) {
+    const { unusedCode } = data;
+
     return (
         <div className="space-y-6">
             <div>
@@ -792,10 +794,7 @@ function ResultsDisplay({ data }: { data: AnalysisResult }) {
                 <WaterfallTabContent />
               </TabsContent>
               <TabsContent value="optimization" className="pt-6">
-                 <Card>
-                    <CardHeader><CardTitle>Optimization</CardTitle></CardHeader>
-                    <CardContent><p>Optimization details coming soon.</p></CardContent>
-                </Card>
+                <UnusedCodeAnalysis unusedCode={unusedCode} />
               </TabsContent>
             </Tabs>
         </div>
@@ -882,5 +881,3 @@ export default function ResultsPage() {
         </Suspense>
     )
 }
-
-    
