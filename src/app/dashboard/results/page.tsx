@@ -323,7 +323,28 @@ function WaterfallTabContent() {
     const [activeType, setActiveType] = useState('All');
 
     const filteredData = waterfallData.filter(item => {
-        const typeMatch = activeType === 'All' || item.type.toLowerCase() === activeType.toLowerCase().slice(0, -1);
+        const typeL = activeType.toLowerCase();
+        const itemType = item.type.toLowerCase();
+        let typeMatch = true;
+        if (activeType !== 'All') {
+            switch(typeL) {
+                case 'images':
+                    typeMatch = itemType === 'img';
+                    break;
+                case 'html':
+                case 'js':
+                case 'css':
+                case 'video':
+                case 'xhr':
+                case 'fonts':
+                case 'other':
+                    typeMatch = itemType === typeL;
+                    break;
+                default:
+                    typeMatch = itemType === typeL;
+            }
+        }
+        
         const filterMatch = item.url.toLowerCase().includes(filter.toLowerCase());
         return typeMatch && filterMatch;
     });
