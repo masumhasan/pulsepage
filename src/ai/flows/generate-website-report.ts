@@ -15,7 +15,7 @@ const GenerateWebsiteReportInputSchema = z.object({
 });
 export type GenerateWebsiteReportInput = z.infer<typeof GenerateWebsiteReportInputSchema>;
 
-export const DetectUnusedCodeOutputSchema = z.object({
+const DetectUnusedCodeOutputSchema = z.object({
   unusedCssPercentage: z.number().describe('The percentage of unused CSS.'),
   unusedJsPercentage: z.number().describe('The percentage of unused JavaScript.'),
   optimizationSuggestions: z.string().describe('Actionable recommendations for optimizing the web page.'),
@@ -132,3 +132,4 @@ const generateWebsiteReportFlow = ai.defineFlow(
     return output;
   }
 );
+
