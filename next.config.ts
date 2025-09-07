@@ -27,6 +27,12 @@ const nextConfig: NextConfig = {
         hostname: 'fonts.gstatic.com',
         port: '',
         pathname: '/s/e/notoemoji/latest/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'i.imgur.com',
+        port: '',
+        pathname: '/**',
       }
     ],
   },

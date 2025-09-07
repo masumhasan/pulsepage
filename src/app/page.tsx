@@ -79,7 +79,7 @@ export default function SmartInspectPage() {
             <div className="flex flex-col items-center justify-center h-full text-center p-4">
                 <div className="max-w-2xl w-full">
                     <div className="mb-4 flex justify-center">
-                        <Image src="https://fonts.gstatic.com/s/e/notoemoji/latest/1f52d/512.webp" alt="Telescope" width={80} height={80} />
+                        <Image src="https://i.imgur.com/xFKPxya.gif" alt="Telescope" width={80} height={80} />
                     </div>
                     <h1 className="text-4xl font-bold tracking-tight mb-4">
                         Website Performance Analysis
