@@ -432,30 +432,32 @@ function WaterfallTabContent() {
                         <p>Fully Loaded 4.4s (Onload 1.1s)</p>
                     </div>
                      <div className="h-[120px] p-4 border-t">
-                        <ResponsiveContainer width="100%" height="100%">
-                            <AreaChart data={summaryChartData} margin={{ top: 5, right: 20, left: -10, bottom: 5 }}>
-                                <defs>
-                                    <linearGradient id="colorCpu" x1="0" y1="0" x2="0" y2="1">
-                                    <stop offset="5%" stopColor="hsl(var(--destructive))" stopOpacity={0.8}/>
-                                    <stop offset="95%" stopColor="hsl(var(--destructive))" stopOpacity={0}/>
-                                    </linearGradient>
-                                    <linearGradient id="colorMemory" x1="0" y1="0" x2="0" y2="1">
-                                    <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.8}/>
-                                    <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0}/>
-                                    </linearGradient>
-                                </defs>
-                                <XAxis dataKey="name" stroke="hsl(var(--muted-foreground))" fontSize={12} tickLine={false} axisLine={false} />
-                                <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} tickLine={false} axisLine={false} />
-                                <Tooltip
-                                  contentStyle={{
-                                    backgroundColor: 'hsl(var(--background))',
-                                    borderColor: 'hsl(var(--border))'
-                                  }}
-                                />
-                                <Area type="monotone" dataKey="value" stroke="hsl(var(--destructive))" fillOpacity={1} fill="url(#colorCpu)" />
-                                <Area type="monotone" dataKey="value" stroke="hsl(var(--primary))" fillOpacity={1} fill="url(#colorMemory)" />
-                            </AreaChart>
-                        </ResponsiveContainer>
+                         <TooltipProvider>
+                            <ResponsiveContainer width="100%" height="100%">
+                                <AreaChart data={summaryChartData} margin={{ top: 5, right: 20, left: -10, bottom: 5 }}>
+                                    <defs>
+                                        <linearGradient id="colorCpu" x1="0" y1="0" x2="0" y2="1">
+                                        <stop offset="5%" stopColor="hsl(var(--destructive))" stopOpacity={0.8}/>
+                                        <stop offset="95%" stopColor="hsl(var(--destructive))" stopOpacity={0}/>
+                                        </linearGradient>
+                                        <linearGradient id="colorMemory" x1="0" y1="0" x2="0" y2="1">
+                                        <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.8}/>
+                                        <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0}/>
+                                        </linearGradient>
+                                    </defs>
+                                    <XAxis dataKey="name" stroke="hsl(var(--muted-foreground))" fontSize={12} tickLine={false} axisLine={false} />
+                                    <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} tickLine={false} axisLine={false} />
+                                    <Tooltip
+                                    contentStyle={{
+                                        backgroundColor: 'hsl(var(--background))',
+                                        borderColor: 'hsl(var(--border))'
+                                    }}
+                                    />
+                                    <Area type="monotone" dataKey="value" stroke="hsl(var(--destructive))" fillOpacity={1} fill="url(#colorCpu)" />
+                                    <Area type="monotone" dataKey="value" stroke="hsl(var(--primary))" fillOpacity={1} fill="url(#colorMemory)" />
+                                </AreaChart>
+                            </ResponsiveContainer>
+                        </TooltipProvider>
                     </div>
                 </div>
 
@@ -605,3 +607,5 @@ export default function ResultsPage() {
         </Suspense>
     )
 }
+
+    
