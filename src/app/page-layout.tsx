@@ -14,7 +14,7 @@ import { Moon, Sun, Search, Settings, Bot, Zap } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
-import { PagePulseIcon } from '@/components/icons';
+import Image from 'next/image';
 
 function ThemeToggle() {
   const { setTheme } = useTheme();
@@ -84,8 +84,8 @@ export default function PageLayout({
             href="/"
             className="flex items-center gap-2 text-lg font-semibold md:text-base"
           >
-            <PagePulseIcon className="h-6 w-6" />
-            <span className="">PagePulse</span>
+            <Image src="https://fonts.gstatic.com/s/e/notoemoji/latest/26a1/512.webp" alt="PulsePage" width={24} height={24} />
+            <span className="">PulsePage</span>
           </Link>
           {navLinks.map((link) => (
             <NavLink key={link.href} {...link} />
