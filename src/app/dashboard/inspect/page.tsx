@@ -18,9 +18,10 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
+import { analyzeUrl } from '@/app/actions';
 
 const formSchema = z.object({
-  url: z.string().url({ message: "Please enter a valid URL." }),
+  url: z.string().min(1, { message: "Please enter a URL." }),
 });
 
 export default function SmartInspectPage() {
@@ -38,23 +39,34 @@ export default function SmartInspectPage() {
     async function onSubmit(values: z.infer<typeof formSchema>) {
         setIsLoading(true);
         try {
-            // Here you would typically call a server action to analyze the URL
-            // For now, we'll just simulate a delay and then navigate to a results page
-            console.log('Analyzing URL:', values.url);
-            await new Promise(resolve => setTimeout(resolve, 2000));
-            // In a real app, you would pass the analysis result to the results page
-            // For example: router.push(`/dashboard/results?url=${values.url}`);
-            toast({
-                title: "Analysis Complete",
-                description: `Showing results for ${values.url}`,
-            });
-             router.push(`/dashboard/results?url=${encodeURIComponent(values.url)}`);
+            // Validate URL client-side before sending to server action
+            let urlToAnalyze = values.url;
+            if (!urlToAnalyze.startsWith('http://') && !urlToAnalyze.startsWith('https://')) {
+                urlToAnalyze = `https://${urlToAnalyze}`;
+            }
+            // Basic check for a valid-looking URL structure
+            new URL(urlToAnalyze);
+
+            // The actual analysis is now done on the results page.
+            // We just navigate to it with the URL.
+            router.push(`/dashboard/results?url=${encodeURIComponent(values.url)}`);
+
         } catch (error: any) {
-            toast({
-                variant: "destructive",
-                title: "Analysis Failed",
-                description: error.message || "Something went wrong.",
-            });
+            let errorMessage = "Please enter a valid URL (e.g., example.com).";
+             if (error instanceof TypeError) {
+                 // This catches invalid URL format errors from `new URL()`
+                 toast({
+                    variant: "destructive",
+                    title: "Invalid URL",
+                    description: errorMessage,
+                });
+             } else {
+                toast({
+                    variant: "destructive",
+                    title: "Analysis Failed",
+                    description: error.message || "Something went wrong.",
+                });
+             }
         } finally {
             setIsLoading(false);
         }
@@ -80,7 +92,7 @@ export default function SmartInspectPage() {
                                     render={({ field }) => (
                                         <FormItem className="w-full text-left">
                                             <FormControl>
-                                                <Input placeholder="https://example.com" {...field} />
+                                                <Input placeholder="example.com" {...field} />
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>
