@@ -8,12 +8,15 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Progress } from '@/components/ui/progress';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import { AlertTriangle, BotMessageSquare, Code, FileText, Gauge, Zap, Clock, Shield } from 'lucide-react';
+import { AlertTriangle, BotMessageSquare, Code, FileText, Gauge, Zap, Clock, Shield, HelpCircle } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import ResultsLoading from './loading';
 import Image from 'next/image';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Switch } from '@/components/ui/switch';
+import { cn } from '@/lib/utils';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 function PerformanceScore({ score }: { score: number }) {
     const getScoreColor = (s: number) => {
@@ -164,6 +167,117 @@ function DetailedReport({ report }: { report: AnalysisResult['detailedReport'] }
     }
 }
 
+const performanceMetricsData = [
+    { title: 'First Contentful Paint', value: '4.4s', description: 'How quickly content like text or images are painted onto your page. A good user experience is 0.9s or less.', rating: 'Much longer than recommended', ratingColor: 'bg-red-200 text-red-800 dark:bg-red-900/50 dark:text-red-300' },
+    { title: 'Time to Interactive', value: '4.4s', description: 'How long it takes for your page to become fully interactive. A good user experience is 2.5s or less.', rating: 'Longer than recommended', ratingColor: 'bg-yellow-200 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-300' },
+    { title: 'Speed Index', value: '2.2s', description: 'How quickly the contents of your page are visibly populated. A good user experience is 1.3s or less.', rating: 'Longer than recommended', ratingColor: 'bg-yellow-200 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-300' },
+    { title: 'Total Blocking Time', value: '0ms', description: 'How much time is blocked by scripts during your page loading process. A good user experience is 150ms or less.', rating: 'Good - Nothing to do here', ratingColor: 'bg-green-200 text-green-800 dark:bg-green-900/50 dark:text-green-300' },
+    { title: 'Largest Contentful Paint', value: '4.4s', description: 'How long it takes for the largest element of content (i.e., a hero image) to be painted on your page. A good user experience is 1.2s or less.', rating: 'Much longer than recommended', ratingColor: 'bg-red-200 text-red-800 dark:bg-red-900/50 dark:text-red-300' },
+    { title: 'Cumulative Layout Shift', value: '0.5', description: 'How much your page\'s layout shifts as it loads. A good user experience is a score of 0.1 or less.', rating: 'Much longer than recommended', ratingColor: 'bg-red-200 text-red-800 dark:bg-red-900/50 dark:text-red-300' },
+];
+
+const browserTimingsData = [
+    { name: 'Redirect Duration', value: '0ms' },
+    { name: 'Connection Duration', value: '24ms' },
+    { name: 'Backend Duration', value: '5ms' },
+    { name: 'Time to First Byte (TTFB)', value: '29ms' },
+    { name: 'DOM Interactive Time', value: '458ms' },
+    { name: 'DOM Content Loaded Time', value: '475ms' },
+    { name: 'First Paint', value: '789ms' },
+    { name: 'Onload Time', value: '1.1s' },
+    { name: 'Fully Loaded Time', value: '4.4s' },
+];
+
+function PerformanceMetricCard({ metric }: { metric: typeof performanceMetricsData[0] }) {
+    const borderColor = {
+        'Much longer than recommended': 'border-l-red-400',
+        'Longer than recommended': 'border-l-yellow-400',
+        'Good - Nothing to do here': 'border-l-green-400',
+    }[metric.rating] || 'border-l-gray-400';
+
+    return (
+        <Card className={cn("overflow-hidden", borderColor, 'border-l-4')}>
+            <CardContent className="p-0">
+                <div className="flex">
+                    <div className="p-4 flex-1">
+                        <CardTitle className="text-lg font-semibold">{metric.title}</CardTitle>
+                        <CardDescription className="text-xs mt-1">
+                            {metric.description} <a href="#" className="text-primary hover:underline">Learn more.</a>
+                        </CardDescription>
+                    </div>
+                    <div className="flex flex-col items-center justify-center p-4 min-w-[120px]">
+                        <div className={cn("px-2 py-0.5 text-xs rounded-t-md w-full text-center", metric.ratingColor)}>
+                            {metric.rating}
+                        </div>
+                        <div className={cn("text-3xl font-bold w-full text-center py-2 rounded-b-md", metric.ratingColor.replace(/bg-(red|yellow|green)-200/, 'bg-$1-100 dark:bg-$1-900/30'))}>
+                            {metric.value}
+                        </div>
+                    </div>
+                </div>
+            </CardContent>
+        </Card>
+    );
+}
+
+function BrowserTimingCard({ timing }: { timing: typeof browserTimingsData[0] }) {
+    return (
+        <Card className="border-l-4 border-l-muted-foreground/50">
+            <CardContent className="p-3 flex justify-between items-center">
+                <div className="flex items-center gap-2">
+                    <p className="text-sm font-medium">{timing.name}</p>
+                     <TooltipProvider>
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <HelpCircle className="h-3 w-3 text-muted-foreground cursor-help" />
+                            </TooltipTrigger>
+                            <TooltipContent>
+                                <p>This timing is a milestone reported by the browser.</p>
+                            </TooltipContent>
+                        </Tooltip>
+                    </TooltipProvider>
+                </div>
+                <p className="text-lg font-semibold">{timing.value}</p>
+            </CardContent>
+        </Card>
+    );
+}
+
+
+function PerformanceTabContent() {
+    return (
+        <div className="space-y-6">
+            <Card>
+                <CardHeader>
+                    <div className="flex justify-between items-center">
+                        <div>
+                            <CardTitle>Performance Metrics</CardTitle>
+                            <CardDescription>The following metrics are generated using Lighthouse Performance data.</CardDescription>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <Switch id="metric-details" />
+                            <label htmlFor="metric-details" className="text-sm font-medium">Metric details</label>
+                        </div>
+                    </div>
+                </CardHeader>
+                <CardContent className="grid gap-4 md:grid-cols-2">
+                    {performanceMetricsData.map(metric => <PerformanceMetricCard key={metric.title} metric={metric} />)}
+                </CardContent>
+            </Card>
+
+            <Card>
+                <CardHeader>
+                    <CardTitle>Browser Timings</CardTitle>
+                    <CardDescription>These timings are milestones reported by the browser.</CardDescription>
+                </CardHeader>
+                <CardContent className="grid gap-4 md:grid-cols-3">
+                    {browserTimingsData.map(timing => <BrowserTimingCard key={timing.name} timing={timing} />)}
+                </CardContent>
+            </Card>
+        </div>
+    );
+}
+
+
 function ResultsDisplay({ data }: { data: AnalysisResult }) {
     return (
         <div className="space-y-6">
@@ -176,14 +290,14 @@ function ResultsDisplay({ data }: { data: AnalysisResult }) {
             </div>
             
             <Tabs defaultValue="summary" className="w-full">
-              <TabsList>
+              <TabsList className="grid w-full grid-cols-5">
                 <TabsTrigger value="summary">Summary</TabsTrigger>
                 <TabsTrigger value="performance">Performance</TabsTrigger>
                 <TabsTrigger value="structure">Structure</TabsTrigger>
                 <TabsTrigger value="waterfall">Waterfall</TabsTrigger>
                 <TabsTrigger value="optimization">Optimization</TabsTrigger>
               </TabsList>
-              <TabsContent value="summary" className="pt-4">
+              <TabsContent value="summary" className="pt-6">
                 <div className="space-y-6">
                     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
                         <PerformanceScore score={data.performanceScore} />
@@ -202,25 +316,22 @@ function ResultsDisplay({ data }: { data: AnalysisResult }) {
                     </div>
                 </div>
               </TabsContent>
-              <TabsContent value="performance">
-                <Card>
-                    <CardHeader><CardTitle>Performance</CardTitle></CardHeader>
-                    <CardContent><p>Performance details coming soon.</p></CardContent>
-                </Card>
+              <TabsContent value="performance" className="pt-6">
+                 <PerformanceTabContent />
               </TabsContent>
-              <TabsContent value="structure">
+              <TabsContent value="structure" className="pt-6">
                 <Card>
                     <CardHeader><CardTitle>Structure</CardTitle></CardHeader>
                     <CardContent><p>Structure details coming soon.</p></CardContent>
                 </Card>
               </TabsContent>
-              <TabsContent value="waterfall">
+              <TabsContent value="waterfall" className="pt-6">
                 <Card>
                     <CardHeader><CardTitle>Waterfall</CardTitle></CardHeader>
                     <CardContent><p>Waterfall details coming soon.</p></CardContent>
                 </Card>
               </TabsContent>
-              <TabsContent value="optimization">
+              <TabsContent value="optimization" className="pt-6">
                  <Card>
                     <CardHeader><CardTitle>Optimization</CardTitle></CardHeader>
                     <CardContent><p>Optimization details coming soon.</p></CardContent>
@@ -311,3 +422,5 @@ export default function ResultsPage() {
         </Suspense>
     )
 }
+
+    
