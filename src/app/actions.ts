@@ -5,7 +5,7 @@ import { generateWebsiteReport } from '@/ai/flows/generate-website-report';
 
 export async function analyzeUrl(url: string): Promise<AnalysisResult> {
     try {
-        if (!url.startsWith('http://') && !url.startsWith('https://')) {
+        if (!url.startsWith('http://') && !url.startsWith('https')) {
             url = `https://${url}`;
         }
         // Validate URL format
@@ -18,7 +18,7 @@ export async function analyzeUrl(url: string): Promise<AnalysisResult> {
             url: url
         };
 
-    } catch (error) => {
+    } catch (error) {
         console.error("Analysis failed:", error);
 
         if (error instanceof TypeError) {
