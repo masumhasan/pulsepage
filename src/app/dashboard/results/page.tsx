@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Progress } from '@/components/ui/progress';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import { AlertTriangle, BotMessageSquare, Code, FileText, Gauge, Zap, Clock, Shield, HelpCircle, Search, Expand, Download, ChevronRight } from 'lucide-react';
+import { AlertTriangle, BotMessageSquare, Code, FileText, Gauge, Zap, Clock, Shield, HelpCircle, Search, Expand, Download, ChevronRight, ChevronDown, Server, Fingerprint, Network } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import ResultsLoading from './loading';
@@ -20,6 +20,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, LineChart, Line, AreaChart, Area, CartesianGrid } from 'recharts';
+import { Badge } from '@/components/ui/badge';
 
 
 function PerformanceScore({ score }: { score: number }) {
@@ -326,22 +327,14 @@ function WaterfallTabContent() {
         const typeL = activeType.toLowerCase();
         const itemType = item.type.toLowerCase();
         let typeMatch = true;
+
         if (activeType !== 'All') {
-            switch(typeL) {
-                case 'images':
-                    typeMatch = itemType === 'img';
-                    break;
-                case 'html':
-                case 'js':
-                case 'css':
-                case 'video':
-                case 'xhr':
-                case 'fonts':
-                case 'other':
-                    typeMatch = itemType === typeL;
-                    break;
-                default:
-                    typeMatch = itemType === typeL;
+            if (typeL === 'images') {
+                typeMatch = itemType === 'img';
+            } else if (resourceTypes.map(t => t.toLowerCase()).includes(typeL)) {
+                typeMatch = itemType === typeL;
+            } else {
+                 typeMatch = itemType === typeL;
             }
         }
         
@@ -487,6 +480,283 @@ function WaterfallTabContent() {
     );
 }
 
+function SummaryTabContent({ data }: { data: AnalysisResult }) {
+    return (
+        <div className="space-y-6">
+            <SpeedVisualization />
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div className="lg:col-span-2">
+                    <TopIssues />
+                </div>
+                <div className="space-y-6">
+                    <PageDetails />
+                    <ServerDetails />
+                </div>
+            </div>
+        </div>
+    );
+}
+
+function SpeedVisualization() {
+    const events = [
+        { name: 'TTFB', time: 36, duration: 0, left: '1%' },
+        { name: 'Onload Time', time: 721, duration: 0, left: '15%' },
+        { name: 'First Contentful Paint', time: 4700, duration: 0, left: '95%', color: 'bg-blue-500' },
+        { name: 'Largest Contentful Paint', time: 4700, duration: 0, left: '95%', color: 'bg-green-500' },
+        { name: 'Time to Interactive', time: 4700, duration: 0, left: '95%', color: 'bg-purple-500' },
+        { name: 'Fully Loaded Time', time: 4700, duration: 0, left: '95%', color: 'bg-red-500' },
+    ]
+
+    return (
+        <Card>
+            <CardHeader>
+                <CardTitle>Speed Visualization</CardTitle>
+            </CardHeader>
+            <CardContent>
+                <div className="relative h-24 w-full rounded-lg bg-muted">
+                    <div className="absolute top-0 left-0 right-0 flex justify-between px-2 text-xs text-muted-foreground">
+                        <span>0.6s</span>
+                        <span>1.2s</span>
+                        <span>1.8s</span>
+                        <span>2.3s</span>
+                        <span>2.9s</span>
+                        <span>3.5s</span>
+                        <span>4.1s</span>
+                        <span>4.7s</span>
+                    </div>
+
+                    <div className="absolute inset-x-0 top-8 h-12 flex items-center">
+                        <div className="w-full h-full flex">
+                            {[...Array(8)].map((_, i) => (
+                                <div key={i} className="flex-1 border-r border-dashed border-border last:border-r-0"></div>
+                            ))}
+                        </div>
+                    </div>
+                     <div className="absolute inset-x-0 top-8 h-12 flex items-center">
+                         <div className="absolute h-12 bg-gray-200 dark:bg-gray-700 rounded-md" style={{ left: '1%', width: '14%' }}>
+                            <div className='p-1'>
+                               <p className="text-xs font-bold">TTFB: 36ms</p>
+                               <p className="text-xs text-muted-foreground">Redirect: 0ms</p>
+                            </div>
+                        </div>
+                         <div className="absolute h-12 bg-gray-200 dark:bg-gray-700 rounded-md" style={{ left: '15%', width: '15%'}}>
+                            <div className='p-1'>
+                               <p className="text-xs font-bold">Onload Time: 721ms</p>
+                            </div>
+                         </div>
+                     </div>
+                </div>
+                 <div className="mt-2 space-y-1">
+                    {events.slice(2).map(event => (
+                        <div key={event.name} className="flex items-center">
+                            <div className={cn("w-4 h-2 rounded-sm mr-2", event.color)}></div>
+                            <span className="text-sm font-medium">{event.name}: {event.time/1000}s</span>
+                        </div>
+                    ))}
+                </div>
+            </CardContent>
+        </Card>
+    );
+}
+
+const topIssuesData = [
+    {
+        severity: 'High',
+        title: 'Avoid enormous network payloads',
+        tag: 'LCP',
+        details: 'Total size was 18.0MB',
+        color: 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300 border-red-200 dark:border-red-800/50',
+        content: {
+            description: 'Large network payloads cost users real money and are highly correlated with long load times.',
+            urls: [
+                { url: 'https://masumhasan.github.io/files/videos/coding.mp4', size: '3.59MB' },
+                { url: 'https://masumhasan.github.io/files/images/works/gg.gif', size: '2.02MB' },
+                { url: 'https://masumhasan.github.io/files/images/contacts.gif', size: '1.66MB' },
+            ]
+        }
+    },
+    {
+        severity: 'Med',
+        title: 'Avoid large layout shifts',
+        tag: 'CLS',
+        details: '15 layout shifts found',
+        color: 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300 border-yellow-200 dark:border-yellow-800/50',
+        content: null
+    },
+    {
+        severity: 'Med-Low',
+        title: 'Use explicit width and height on image elements',
+        tag: 'CLS',
+        details: '18 images found',
+        color: 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 border-green-200 dark:border-green-800/50',
+        content: null
+    },
+     {
+        severity: 'Med-Low',
+        title: 'Serve static assets with an efficient cache policy',
+        details: 'Potential savings of 14.9MB',
+        color: 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 border-green-200 dark:border-green-800/50',
+        content: null
+    },
+
+];
+
+
+function TopIssues() {
+    return (
+        <Card>
+            <CardHeader>
+                <CardTitle>Top Issues</CardTitle>
+                <CardDescription>These audits are identified as the top issues impacting your performance.</CardDescription>
+                <div className="pt-2">
+                    <Tabs defaultValue="all">
+                        <TabsList>
+                            <TabsTrigger value="all">All</TabsTrigger>
+                            <TabsTrigger value="fcp">FCP</TabsTrigger>
+                            <TabsTrigger value="lcp">LCP</TabsTrigger>
+                            <TabsTrigger value="tbt">TBT</TabsTrigger>
+                            <TabsTrigger value="cls">CLS</TabsTrigger>
+                        </TabsList>
+                    </Tabs>
+                </div>
+            </CardHeader>
+            <CardContent>
+                <Accordion type="single" collapsible defaultValue="item-0">
+                    {topIssuesData.map((issue, index) => (
+                        <AccordionItem value={`item-${index}`} key={index} className={cn("my-2 border rounded-lg", issue.color)}>
+                            <AccordionTrigger className="p-4 text-left hover:no-underline">
+                                <div className="flex items-center gap-4 w-full">
+                                    <Badge variant="destructive" className="h-6">{issue.severity}</Badge>
+                                    <span className="font-semibold flex-1">{issue.title} {issue.tag && <Badge variant="outline" className="ml-2">{issue.tag}</Badge>}</span>
+                                    <span className="text-sm text-muted-foreground mr-4">{issue.details}</span>
+                                </div>
+                            </AccordionTrigger>
+                            <AccordionContent className="p-4 pt-0">
+                                {issue.content && (
+                                    <>
+                                        <p className="mb-4">{issue.content.description}</p>
+                                        <div className="border rounded-md">
+                                             <Table>
+                                                <TableHeader>
+                                                    <TableRow>
+                                                        <TableHead>URL</TableHead>
+                                                        <TableHead className="text-right">Transfer Size</TableHead>
+                                                    </TableRow>
+                                                </TableHeader>
+                                                <TableBody>
+                                                    {issue.content.urls.map(item => (
+                                                        <TableRow key={item.url}>
+                                                            <TableCell className="font-medium truncate max-w-xs"><a href="#" className="hover:underline">{item.url}</a></TableCell>
+                                                            <TableCell className="text-right">{item.size}</TableCell>
+                                                        </TableRow>
+                                                    ))}
+                                                </TableBody>
+                                            </Table>
+                                        </div>
+                                        <Button variant="link" className="px-0 mt-2">Learn how to improve this</Button>
+                                    </>
+                                )}
+                            </AccordionContent>
+                        </AccordionItem>
+                    ))}
+                </Accordion>
+            </CardContent>
+        </Card>
+    );
+}
+
+function PageDetails() {
+    const data = [
+        { name: 'IMG', value: 13.2, color: 'bg-blue-500' },
+        { name: 'Video', value: 4.62, color: 'bg-sky-500' },
+    ];
+    const total = data.reduce((acc, curr) => acc + curr.value, 0);
+
+    const requestData = [
+        { name: 'IMG', value: 66.2, color: 'bg-blue-500' },
+        { name: 'Other', value: 14.9, color: 'bg-gray-400' },
+        { name: 'JS', value: 8.1, color: 'bg-yellow-400' },
+        { name: 'CSS', value: 6.4, color: 'bg-purple-500' },
+    ]
+
+    return (
+        <Card>
+            <CardHeader>
+                <CardTitle>Page Details</CardTitle>
+                <CardDescription>Pages with smaller total sizes and fewer requests tend to load faster.</CardDescription>
+            </CardHeader>
+            <CardContent>
+                <div className="space-y-6">
+                    <div>
+                        <div className="flex justify-between items-center mb-1">
+                            <h4 className="font-semibold">4.7s</h4>
+                            <p className="text-sm text-muted-foreground">Fully Loaded Time</p>
+                        </div>
+                        <Progress value={100} />
+                    </div>
+                    <div>
+                        <h4 className="font-semibold mb-2">Total Page Size - 17.9MB</h4>
+                        <div className="flex w-full h-8 rounded-md overflow-hidden">
+                            {data.map(item => (
+                                <div key={item.name} className={cn("flex items-center justify-center text-white text-xs font-bold", item.color)} style={{ width: `${(item.value / total) * 100}%` }}>
+                                    {item.name} {item.value}MB
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                    <div>
+                        <h4 className="font-semibold mb-2">Total Page Requests - 74</h4>
+                        <div className="flex w-full h-8 rounded-md overflow-hidden">
+                             {requestData.map(item => (
+                                <div key={item.name} className={cn("flex items-center justify-center text-white text-xs font-bold", item.color)} style={{ width: `${item.value}%` }}>
+                                    {item.name} {item.value}%
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                    <p className="text-xs text-muted-foreground">Look into reducing JavaScript, reducing web-fonts, and image optimization to ensure a lightweight and streamlined website.</p>
+                </div>
+            </CardContent>
+        </Card>
+    );
+}
+
+function ServerDetails() {
+    return (
+        <Card>
+            <CardHeader>
+                <CardTitle>Server Details</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+                <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2 text-sm">
+                        <Server className="h-4 w-4 text-muted-foreground" />
+                        <span>IP Address</span>
+                    </div>
+                    <span className="font-mono text-sm">172.67.173.237</span>
+                </div>
+                 <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2 text-sm">
+                        <Fingerprint className="h-4 w-4 text-muted-foreground" />
+                        <span>Nameservers</span>
+                    </div>
+                    <div className="text-right">
+                        <span className="font-mono text-sm">chloe.ns.cloudflare.com</span><br/>
+                        <span className="font-mono text-sm">major.ns.cloudflare.com</span>
+                    </div>
+                </div>
+                <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2 text-sm">
+                        <Network className="h-4 w-4 text-muted-foreground" />
+                        <span>Powered By</span>
+                    </div>
+                    <span className="font-mono text-sm">Cloudflare</span>
+                </div>
+            </CardContent>
+        </Card>
+    )
+}
+
 function ResultsDisplay({ data }: { data: AnalysisResult }) {
     return (
         <div className="space-y-6">
@@ -507,23 +777,7 @@ function ResultsDisplay({ data }: { data: AnalysisResult }) {
                 <TabsTrigger value="optimization">Optimization</TabsTrigger>
               </TabsList>
               <TabsContent value="summary" className="pt-6">
-                <div className="space-y-6">
-                    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-                        <PerformanceScore score={data.performanceScore} />
-                        <WebVital title="Largest Contentful Paint" value={data.webVitals.lcp} Icon={Clock} />
-                        <WebVital title="Cumulative Layout Shift" value={data.webVitals.cls} Icon={Shield} />
-                        <WebVital title="Total Blocking Time" value={data.webVitals.tbt} Icon={FileText} />
-                    </div>
-                    <div className="grid gap-4 lg:grid-cols-2">
-                        <UnusedCodeAnalysis unusedCode={data.unusedCode} />
-                        <DetailedReport report={data.detailedReport} />
-                    </div>
-                     <div className="text-center pt-4">
-                        <Link href="/">
-                            <Button>Analyze Another URL</Button>
-                        </Link>
-                    </div>
-                </div>
+                 <SummaryTabContent data={data} />
               </TabsContent>
               <TabsContent value="performance" className="pt-6">
                  <PerformanceTabContent />
