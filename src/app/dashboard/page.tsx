@@ -1,3 +1,4 @@
+
 'use client';
 
 import { Button } from "@/components/ui/button";
@@ -263,9 +264,9 @@ function CodeBlockList() {
                 <AccordionItem value={block.id} key={block.id} className="border-none">
                      <Card className="border-t-4 border-red-500">
                         <CardHeader>
-                            <AccordionTrigger className="p-0 hover:no-underline">
-                                 <div className="flex justify-between items-center w-full">
-                                    <div>
+                            <div className="flex justify-between items-start w-full">
+                                <AccordionTrigger className="p-0 hover:no-underline flex-1">
+                                    <div className="text-left">
                                         <div className="flex items-center gap-2">
                                             <CardTitle className="text-lg font-bold">{block.title}</CardTitle>
                                             <Badge variant="destructive">{block.percentage}% unused</Badge>
@@ -274,12 +275,12 @@ function CodeBlockList() {
                                          <p className="text-sm text-muted-foreground text-left mt-1">{block.file} - Lines {block.lines}</p>
                                          <p className="text-sm text-muted-foreground text-left">{block.description}</p>
                                     </div>
-                                     <div className="flex items-center gap-2">
-                                        <Button variant="outline" size="sm">View File</Button>
-                                        <Button variant="destructive" size="icon"><Trash2 className="h-4 w-4" /></Button>
-                                    </div>
+                                </AccordionTrigger>
+                                 <div className="flex items-center gap-2 ml-4">
+                                    <Button variant="outline" size="sm">View File</Button>
+                                    <Button variant="destructive" size="icon"><Trash2 className="h-4 w-4" /></Button>
                                 </div>
-                            </AccordionTrigger>
+                            </div>
                         </CardHeader>
                         <AccordionContent>
                              <div className="bg-muted dark:bg-zinc-800 rounded-lg overflow-hidden">
@@ -315,3 +316,5 @@ export default function Page() {
         </PageLayout>
     )
 }
+
+    
