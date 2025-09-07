@@ -18,7 +18,7 @@ const DetailedReportInputSchema = z.object({
 export type DetailedReportInput = z.infer<typeof DetailedReportInputSchema>;
 
 const DetailedReportOutputSchema = z.object({
-  report: z.string().describe('A detailed report with page speed metrics and actionable optimization recommendations.'),
+  report: z.string().describe('A detailed report with page speed metrics and actionable optimization recommendations in JSON format.'),
 });
 export type DetailedReportOutput = z.infer<typeof DetailedReportOutputSchema>;
 
@@ -35,8 +35,28 @@ const detailedReportPrompt = ai.definePrompt({
 URL: {{{url}}}
 Coverage Data: {{{coverageData}}}
 
-Report:
-`, // Ensure the output contains the report
+Return the report as a JSON object with the following structure:
+{
+  "page_speed_metrics": {
+    "first_contentful_paint": { "value": "1.2s", "rating": "good" },
+    "speed_index": { "value": "2.5s", "rating": "needs_improvement" },
+    "time_to_interactive": { "value": "3.8s", "rating": "poor" }
+  },
+  "image_optimizations": [
+    "Compress and resize images to reduce file size.",
+    "Use modern image formats like WebP.",
+    "Implement lazy loading for offscreen images."
+  ],
+  "resource_loading": [
+    "Minify CSS, JavaScript, and HTML.",
+    "Remove unused CSS.",
+    "Leverage browser caching."
+  ]
+}
+
+The "rating" should be one of "good", "needs_improvement", or "poor".
+Provide real, actionable recommendations based on general web performance best practices. The provided coverage data is a placeholder.
+`,
 });
 
 const detailedReportFlow = ai.defineFlow(

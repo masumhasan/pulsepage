@@ -12,7 +12,7 @@ import { AlertTriangle, BotMessageSquare, Code, FileText, Gauge, Zap, Clock, Shi
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import ResultsLoading from './loading';
-
+import Image from 'next/image';
 
 function PerformanceScore({ score }: { score: number }) {
     const getScoreColor = (s: number) => {
@@ -74,7 +74,7 @@ function UnusedCodeAnalysis({ unusedCode }: { unusedCode: AnalysisResult['unused
                     <AccordionItem value="suggestions">
                         <AccordionTrigger className="text-base">
                             <div className='flex items-center gap-2'>
-                                <Zap className="h-5 w-5" />
+                                <Image src="https://fonts.gstatic.com/s/e/notoemoji/latest/26a1/512.webp" alt="Zap" width={20} height={20} />
                                 Optimization Suggestions
                             </div>
                         </AccordionTrigger>
@@ -89,26 +89,88 @@ function UnusedCodeAnalysis({ unusedCode }: { unusedCode: AnalysisResult['unused
 }
 
 function DetailedReport({ report }: { report: AnalysisResult['detailedReport'] }) {
-    return (
+     try {
+        const reportData = JSON.parse(report.report);
+
+        const metricColors: { [key: string]: string } = {
+            good: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300',
+            needs_improvement: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300',
+            poor: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300',
+        };
+
+        return (
         <Card>
             <CardHeader>
                  <div className="flex items-center gap-2">
-                    <BotMessageSquare className="h-6 w-6" />
+                    <Image src="https://fonts.gstatic.com/s/e/notoemoji/latest/1f916/512.webp" alt="Bot" width={24} height={24} />
                     <CardTitle>AI-Generated Detailed Report</CardTitle>
                 </div>
             </CardHeader>
-            <CardContent className="prose prose-sm dark:prose-invert max-w-none">
-                 <p>{report.report}</p>
+            <CardContent className="space-y-4">
+                {Object.entries(reportData).map(([section, data]: [string, any]) => (
+                    <Card key={section} className="bg-background/50">
+                        <CardHeader>
+                            <CardTitle className="text-lg capitalize">{section.replace(/_/g, ' ')}</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            {Array.isArray(data) ? (
+                                <ul className="space-y-2">
+                                    {data.map((item, index) => (
+                                        <li key={index} className="flex items-start gap-3">
+                                            <span className="text-primary mt-1">•</span>
+                                            <span>{item}</span>
+                                        </li>
+                                    ))}
+                                </ul>
+                            ) : (
+                                <div className="space-y-2">
+                                    {Object.entries(data).map(([key, value]: [string, any]) => (
+                                        <div key={key} className="flex justify-between items-center p-2 rounded-md bg-muted/50">
+                                            <span className="font-medium capitalize">{key.replace(/_/g, ' ')}</span>
+                                            {typeof value === 'object' ? (
+                                                <span className={`px-2 py-1 text-xs rounded-full ${metricColors[value.rating] || 'bg-gray-200 text-gray-800'}`}>
+                                                    {value.value}
+                                                </span>
+                                            ) : (
+                                                <span>{String(value)}</span>
+                                            )}
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </CardContent>
+                    </Card>
+                ))}
             </CardContent>
         </Card>
-    );
+        );
+
+    } catch (e) {
+        // Fallback for non-JSON reports
+        return (
+             <Card>
+                <CardHeader>
+                     <div className="flex items-center gap-2">
+                        <Image src="https://fonts.gstatic.com/s/e/notoemoji/latest/1f916/512.webp" alt="Bot" width={24} height={24} />
+                        <CardTitle>AI-Generated Detailed Report</CardTitle>
+                    </div>
+                </CardHeader>
+                <CardContent className="prose prose-sm dark:prose-invert max-w-none">
+                     <p>{report.report}</p>
+                </CardContent>
+            </Card>
+        )
+    }
 }
 
 function ResultsDisplay({ data }: { data: AnalysisResult }) {
     return (
         <div className="space-y-6">
             <div>
-                <h1 className="text-3xl font-bold">Analysis Results</h1>
+                <div className="flex items-center gap-2">
+                    <h1 className="text-3xl font-bold">Analysis Results</h1>
+                    <Image src="https://fonts.gstatic.com/s/e/notoemoji/latest/1f973/512.webp" alt="Party" width={32} height={32} />
+                </div>
                 <p className="text-muted-foreground break-all">For: <a href={data.url} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">{data.url}</a></p>
             </div>
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -117,7 +179,7 @@ function ResultsDisplay({ data }: { data: AnalysisResult }) {
                 <WebVital title="Cumulative Layout Shift" value={data.webVitals.cls} Icon={Shield} />
                 <WebVital title="Total Blocking Time" value={data.webVitals.tbt} Icon={FileText} />
             </div>
-            <div className="grid gap-4 md:grid-cols-2">
+            <div className="grid gap-4 lg:grid-cols-2">
                 <UnusedCodeAnalysis unusedCode={data.unusedCode} />
                 <DetailedReport report={data.detailedReport} />
             </div>
@@ -170,6 +232,9 @@ function ResultsPageContent() {
              <div className="flex flex-col items-center justify-center h-full text-center">
                 <Card className="w-full max-w-md">
                     <CardContent className="p-6">
+                         <div className='flex justify-center mb-4'>
+                            <Image src="https://fonts.gstatic.com/s/e/notoemoji/latest/1f62d/512.webp" alt="Sad face" width={48} height={48} />
+                         </div>
                         <Alert variant="destructive">
                             <AlertTriangle className="h-4 w-4" />
                             <AlertTitle>Analysis Failed</AlertTitle>
@@ -187,7 +252,8 @@ function ResultsPageContent() {
     if (!result) {
         return (
              <div className="flex flex-col items-center justify-center h-full text-center">
-                <p>No results to display.</p>
+                 <Image src="https://fonts.gstatic.com/s/e/notoemoji/latest/1f937_200d_2642/512.webp" alt="Shrug" width={64} height={64} />
+                <p className='mt-4'>No results to display.</p>
                  <Link href="/dashboard/inspect" className='mt-4 block'>
                     <Button>Start New Analysis</Button>
                 </Link>

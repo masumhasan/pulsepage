@@ -22,6 +22,12 @@ const nextConfig: NextConfig = {
         port: '',
         pathname: '/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'fonts.gstatic.com',
+        port: '',
+        pathname: '/s/e/notoemoji/latest/**',
+      }
     ],
   },
 };

@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Bot, User } from "lucide-react";
+import Image from 'next/image';
 
 export default function AiAssistantPage() {
     return (
@@ -22,7 +23,9 @@ export default function AiAssistantPage() {
                 </div>
                 <div className="flex items-start gap-4">
                     <Avatar>
-                        <AvatarFallback><Bot /></AvatarFallback>
+                       <AvatarFallback>
+                           <Image src="https://fonts.gstatic.com/s/e/notoemoji/latest/1f916/512.webp" alt="Bot" width={24} height={24} />
+                       </AvatarFallback>
                     </Avatar>
                     <Card>
                         <CardContent className="p-4">

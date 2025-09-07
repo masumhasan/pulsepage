@@ -2,14 +2,16 @@
 
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Loader2 } from "lucide-react";
+import Image from 'next/image';
 
 export default function ResultsLoading() {
     return (
-        <div className="space-y-6 animate-pulse">
-            <div className="flex items-center justify-center text-center">
+        <div className="space-y-6">
+            <div className="flex items-center justify-center text-center p-8">
                 <div>
-                    <Loader2 className="mx-auto h-12 w-12 animate-spin text-primary mb-4" />
+                    <div className="flex justify-center mb-4">
+                        <Image src="https://fonts.gstatic.com/s/e/notoemoji/latest/1f52c/512.webp" alt="Analyzing" width={64} height={64} className="animate-pulse" />
+                    </div>
                     <h1 className="text-2xl font-bold">Analyzing your page...</h1>
                     <p className="text-muted-foreground">This may take a moment. We're running a deep analysis.</p>
                 </div>
