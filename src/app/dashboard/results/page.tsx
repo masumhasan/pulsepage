@@ -3,7 +3,7 @@
 import { useEffect, useState, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { analyzeUrl } from '@/app/actions';
-import type { AnalysisResult, PerformanceMetric, BrowserTiming, WaterfallItem, TopIssue } from '@/lib/types';
+import type { AnalysisResult, PerformanceMetric, BrowserTiming, WaterfallItem, TopIssue, StructureAuditGroup } from '@/lib/types';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
@@ -636,6 +636,114 @@ function ServerDetails({data}: {data: AnalysisResult}) {
     )
 }
 
+function StructureTabContent({ data }: { data: AnalysisResult }) {
+    const { structureAudits } = data;
+
+    if (!structureAudits || structureAudits.length === 0) {
+        return (
+            <Card>
+                <CardHeader>
+                    <CardTitle>Structure</CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <p className='p-4'>Structure analysis data is not available for this URL.</p>
+                </CardContent>
+            </Card>
+        );
+    }
+    
+    const impactOrder: StructureAuditGroup['impact'][] = ['High', 'Medium', 'Medium-Low', 'Low', 'Informational', 'Passed'];
+
+    const sortedAudits = [...structureAudits].sort((a, b) => {
+        return impactOrder.indexOf(a.impact) - impactOrder.indexOf(b.impact);
+    });
+
+    const getImpactStyles = (impact: StructureAuditGroup['impact']): { badge: string, dot: string } => {
+        switch (impact) {
+            case 'High': return { badge: 'bg-red-500 hover:bg-red-600', dot: 'bg-red-500' };
+            case 'Medium': return { badge: 'bg-orange-500 hover:bg-orange-600', dot: 'bg-orange-500' };
+            case 'Medium-Low': return { badge: 'bg-yellow-500 hover:bg-yellow-600', dot: 'bg-yellow-500' };
+            case 'Low': return { badge: 'bg-green-500 hover:bg-green-600', dot: 'bg-green-500' };
+            case 'Informational': return { badge: 'bg-blue-500 hover:bg-blue-600', dot: 'bg-blue-500' };
+            case 'Passed': return { badge: 'bg-gray-500 hover:bg-gray-600', dot: 'bg-gray-500' };
+            default: return { badge: 'bg-gray-500 hover:bg-gray-600', dot: 'bg-gray-500' };
+        }
+    }
+
+    return (
+        <Card>
+            <CardHeader>
+                <CardTitle>Structure Audits</CardTitle>
+                <CardDescription>Audits are grouped by impact level, from highest to lowest.</CardDescription>
+                <div className="pt-2">
+                    <Tabs defaultValue="all">
+                        <TabsList>
+                            <TabsTrigger value="all">All</TabsTrigger>
+                            <TabsTrigger value="fcp">FCP</TabsTrigger>
+                            <TabsTrigger value="lcp">LCP</TabsTrigger>
+                            <TabsTrigger value="tbt">TBT</TabsTrigger>
+                            <TabsTrigger value="cls">CLS</TabsTrigger>
+                        </TabsList>
+                    </Tabs>
+                </div>
+            </CardHeader>
+            <CardContent>
+                <Accordion type="multiple" className="w-full space-y-2">
+                    {sortedAudits.map((group) => (
+                        group.audits.map((audit, index) => (
+                        <AccordionItem value={`${group.impact}-${index}`} key={`${group.impact}-${index}`} className="border-none">
+                             <Card className="border">
+                                <AccordionTrigger className="p-4 text-left hover:no-underline [&[data-state=open]>div>svg]:rotate-180">
+                                    <div className="flex items-center gap-4 w-full">
+                                        <Badge className={cn("text-white w-24 justify-center", getImpactStyles(group.impact).badge)}>{group.impact}</Badge>
+                                        <div className="flex-1 text-left">
+                                            <span className="font-semibold">{audit.title}</span>
+                                            {audit.tag && <Badge variant="outline" className="ml-2">{audit.tag}</Badge>}
+                                        </div>
+                                        <span className="text-sm text-muted-foreground mr-4">{audit.details}</span>
+                                        <ChevronDown className="h-5 w-5 shrink-0 transition-transform duration-200" />
+                                    </div>
+                                </AccordionTrigger>
+                                <AccordionContent className="p-4 pt-0">
+                                    {audit.content && (
+                                        <>
+                                            <p className="mb-4 prose prose-sm dark:prose-invert max-w-none">{audit.content.description}</p>
+                                            {audit.content.urls && audit.content.urls.length > 0 && (
+                                                <div className="border rounded-md">
+                                                    <Table>
+                                                        <TableHeader>
+                                                            <TableRow>
+                                                                <TableHead>URL</TableHead>
+                                                                <TableHead className="text-right">Transfer Size</TableHead>
+                                                            </TableRow>
+                                                        </TableHeader>
+                                                        <TableBody>
+                                                            {audit.content.urls.map(item => (
+                                                                <TableRow key={item.url}>
+                                                                    <TableCell className="font-medium truncate max-w-xs">
+                                                                        <a href={item.url} target="_blank" rel="noopener noreferrer" className="hover:underline">{item.url}</a>
+                                                                    </TableCell>
+                                                                    <TableCell className="text-right">{item.size}</TableCell>
+                                                                </TableRow>
+                                                            ))}
+                                                        </TableBody>
+                                                    </Table>
+                                                </div>
+                                            )}
+                                            <Button variant="link" className="px-0 mt-2">Learn how to improve this</Button>
+                                        </>
+                                    )}
+                                </AccordionContent>
+                             </Card>
+                        </AccordionItem>
+                        ))
+                    ))}
+                </Accordion>
+            </CardContent>
+        </Card>
+    );
+}
+
 function ResultsDisplay({ data }: { data: AnalysisResult }) {
     return (
         <div className="space-y-6">
@@ -662,10 +770,7 @@ function ResultsDisplay({ data }: { data: AnalysisResult }) {
                  <PerformanceTabContent data={data} />
               </TabsContent>
               <TabsContent value="structure" className="pt-6">
-                <Card>
-                    <CardHeader><CardTitle>Structure</CardTitle></CardHeader>
-                    <CardContent><p className='p-4'>Structure analysis data is not available for this URL.</p></CardContent>
-                </Card>
+                <StructureTabContent data={data} />
               </TabsContent>
               <TabsContent value="waterfall" className="pt-6">
                 <WaterfallTabContent data={data} />

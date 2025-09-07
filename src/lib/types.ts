@@ -56,6 +56,25 @@ export type ServerDetails = {
     poweredBy: string;
 };
 
+export type AuditItem = {
+    title: string;
+    tag?: string;
+    details: string;
+    content?: {
+        description: string;
+        urls?: Array<{
+            url: string;
+            size: string;
+        }>;
+    };
+};
+
+export type StructureAuditGroup = {
+    impact: 'High' | 'Medium' | 'Medium-Low' | 'Low' | 'Informational' | 'Passed';
+    audits: AuditItem[];
+};
+
+
 export type AnalysisResult = GenerateWebsiteReportOutput & {
   url: string;
 };

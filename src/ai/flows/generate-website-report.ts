@@ -15,12 +15,6 @@ const GenerateWebsiteReportInputSchema = z.object({
 });
 export type GenerateWebsiteReportInput = z.infer<typeof GenerateWebsiteReportInputSchema>;
 
-const DetectUnusedCodeOutputSchema = z.object({
-  unusedCssPercentage: z.number().describe('The percentage of unused CSS.'),
-  unusedJsPercentage: z.number().describe('The percentage of unused JavaScript.'),
-  optimizationSuggestions: z.string().describe('Actionable recommendations for optimizing the web page.'),
-});
-export type DetectUnusedCodeOutput = z.infer<typeof DetectUnusedCodeOutputSchema>;
 
 const PerformanceMetricSchema = z.object({
     title: z.string(),
@@ -72,6 +66,24 @@ const ServerDetailsSchema = z.object({
     poweredBy: z.string(),
 });
 
+const AuditItemSchema = z.object({
+    title: z.string(),
+    tag: z.string().optional(),
+    details: z.string(),
+    content: z.object({
+        description: z.string(),
+        urls: z.array(z.object({
+            url: z.string().url(),
+            size: z.string(),
+        })).optional(),
+    }).optional(),
+});
+
+const StructureAuditGroupSchema = z.object({
+    impact: z.enum(['High', 'Medium', 'Medium-Low', 'Low', 'Informational', 'Passed']),
+    audits: z.array(AuditItemSchema),
+});
+
 
 const GenerateWebsiteReportOutputSchema = z.object({
   performanceScore: z.number().min(0).max(100).describe("A score from 0-100 for the website's performance."),
@@ -80,13 +92,18 @@ const GenerateWebsiteReportOutputSchema = z.object({
     cls: z.string().describe("Cumulative Layout Shift score."),
     tbt: z.string().describe("Total Blocking Time, in milliseconds."),
   }),
-  unusedCode: DetectUnusedCodeOutputSchema.describe("Analysis of unused CSS and JavaScript."),
+  unusedCode: z.object({
+    unusedCssPercentage: z.number().describe('The percentage of unused CSS.'),
+    unusedJsPercentage: z.number().describe('The percentage of unused JavaScript.'),
+    optimizationSuggestions: z.string().describe('Actionable recommendations for optimizing the web page.'),
+  }).describe("Analysis of unused CSS and JavaScript."),
   performanceMetrics: z.array(PerformanceMetricSchema).describe("An array of performance metrics like FCP, TTI, Speed Index."),
   browserTimings: z.array(BrowserTimingSchema).describe("An array of browser-reported timings like TTFB, DOM Interactive."),
   waterfall: z.array(WaterfallItemSchema).describe("A waterfall chart of network requests. Should contain between 20 to 40 realistic items for a typical webpage."),
   topIssues: z.array(TopIssueSchema).describe("A list of the top 3-5 performance issues found."),
   pageDetails: PageDetailsSchema.describe("Details about the page size and request counts."),
   serverDetails: ServerDetailsSchema.describe("Details about the web server hosting the URL."),
+  structureAudits: z.array(StructureAuditGroupSchema).describe("A list of structure audits grouped by impact level."),
 });
 export type GenerateWebsiteReportOutput = z.infer<typeof GenerateWebsiteReportOutputSchema>;
 
@@ -113,6 +130,7 @@ Based on the URL, generate a complete and realistic report covering all aspects 
 - **topIssues**: Identify 3-5 top performance issues based on your analysis. The issues should be specific and actionable.
 - **pageDetails**: Calculate total page size, request count, and provide a breakdown by content type.
 - **serverDetails**: Provide plausible server details, including a public IP, common nameservers (like Cloudflare, AWS, etc.), and the server technology.
+- **structureAudits**: Generate a list of structure audits grouped by impact. Provide a realistic set of audits for each impact level (High, Medium, Medium-Low, Low, Informational, Passed). The content should be detailed and actionable, similar to what GTmetrix or Lighthouse would provide. Include descriptions and affected URLs where appropriate.
 
 Ensure all fields in the output schema are populated with high-quality, realistic data. The entire output must be a single JSON object matching the defined schema.
 `,
@@ -132,4 +150,3 @@ const generateWebsiteReportFlow = ai.defineFlow(
     return output;
   }
 );
-
