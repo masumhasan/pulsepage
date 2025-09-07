@@ -10,7 +10,7 @@ export default function ResultsLoading() {
             <div className="flex items-center justify-center text-center p-8">
                 <div>
                     <div className="flex justify-center mb-4">
-                        <Image src="https://fonts.gstatic.com/s/e/notoemoji/latest/1f52c/512.webp" alt="Analyzing" width={64} height={64} className="animate-pulse" />
+                        <Image src="https://fonts.gstatic.com/s/e/notoemoji/latest/1f50d/512.webp" alt="Analyzing" width={64} height={64} className="animate-pulse" />
                     </div>
                     <h1 className="text-2xl font-bold">Analyzing your page...</h1>
                     <p className="text-muted-foreground">This may take a moment. We're running a deep analysis.</p>
