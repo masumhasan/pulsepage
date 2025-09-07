@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Progress } from '@/components/ui/progress';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import { AlertTriangle, BotMessageSquare, Code, FileText, Gauge, Zap, Clock, Shield, HelpCircle } from 'lucide-react';
+import { AlertTriangle, BotMessageSquare, Code, FileText, Gauge, Zap, Clock, Shield, HelpCircle, Search, Expand, Download, ChevronRight } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import ResultsLoading from './loading';
@@ -17,6 +17,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Switch } from '@/components/ui/switch';
 import { cn } from '@/lib/utils';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Input } from '@/components/ui/input';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, LineChart, Line, AreaChart, Area, CartesianGrid } from 'recharts';
+
 
 function PerformanceScore({ score }: { score: number }) {
     const getScoreColor = (s: number) => {
@@ -278,6 +282,188 @@ function PerformanceTabContent() {
 }
 
 
+const waterfallData = [
+    { url: '/', status: 200, domain: 'masumhasan.github.io', size: '7.71KB', time: 30, type: 'html', start: 0 },
+    { url: 'css2?family=Oxygen:wght@3...', status: 200, domain: 'fonts.googleapis.com', size: '890B', time: 76, type: 'css', start: 30 },
+    { url: 'bulma.css', status: 200, domain: 'masumhasan.github.io', size: '29.7KB', time: 176, type: 'css', start: 35 },
+    { url: 'style.css', status: 200, domain: 'masumhasan.github.io', size: '5.91KB', time: 84, type: 'css', start: 40 },
+    { url: 'custom.css', status: 200, domain: 'masumhasan.github.io', size: '377B', time: 85, type: 'js', start: 42 },
+    { url: 'favdark.png', status: 200, domain: 'masumhasan.github.io', size: '327B', time: 110, type: 'img', start: 100 },
+    { url: '512.webp', status: 200, domain: 'fonts.gstatic.com', size: '181KB', time: 125, type: 'img', start: 110 },
+    { url: '512.webp', status: 200, domain: 'fonts.gstatic.com', size: '101KB', time: 108, type: 'img', start: 150 },
+    { url: 'firebase.png', status: 200, domain: 'masumhasan.github.io', size: '2.70KB', time: 99, type: 'img', start: 180 },
+    { url: '512.webp', status: 200, domain: 'fonts.gstatic.com', size: '575KB', time: 107, type: 'img', start: 200 },
+    { url: 'research3d.gif', status: 200, domain: 'masumhasan.github.io', size: '799KB', time: 458, type: 'img', start: 210 },
+    { url: 'design3d.gif', status: 200, domain: 'masumhasan.github.io', size: '859KB', time: 575, type: 'img', start: 220 },
+    { url: 'bulb3d.gif', status: 200, domain: 'masumhasan.github.io', size: '608KB', time: 732, type: 'img', start: 230 },
+    { url: 'rocket3d.gif', status: 200, domain: 'masumhasan.github.io', size: '694KB', time: 347, type: 'img', start: 250 },
+    { url: 'bridgescore.png', status: 200, domain: 'masumhasan.github.io', size: '289KB', time: 152, type: 'img', start: 280 },
+    { url: 'baymaxt.gif', status: 200, domain: 'masumhasan.github.io', size: '1.09MB', time: 300, type: 'img', start: 300 },
+    { url: 'today-milk.jpg', status: 503, domain: 'masumhasan.github.io', size: '53.6KB', time: 145, type: 'img', start: 400 },
+];
+
+const resourceTypes = ['All', 'HTML', 'JS', 'CSS', 'Images', 'Video', 'XHR', 'Fonts', 'Other'];
+const resourceTypeColors: { [key: string]: string } = {
+    html: 'hsl(var(--primary))',
+    css: 'hsl(140, 70%, 45%)',
+    js: 'hsl(50, 80%, 55%)',
+    img: 'hsl(var(--primary))',
+    default: 'hsl(var(--muted-foreground))'
+}
+
+const summaryChartData = [
+  { name: 'CPU', value: 96.8, fill: 'hsl(var(--destructive))' },
+  { name: 'Memory', value: 75, fill: 'hsl(var(--primary))' },
+  { name: 'Bandwidth', value: 50, fill: 'hsl(var(--accent-foreground))' },
+];
+
+
+function WaterfallTabContent() {
+    const [filter, setFilter] = useState('');
+    const [activeType, setActiveType] = useState('All');
+
+    const filteredData = waterfallData.filter(item => {
+        const typeMatch = activeType === 'All' || item.type.toLowerCase() === activeType.toLowerCase().slice(0, -1);
+        const filterMatch = item.url.toLowerCase().includes(filter.toLowerCase());
+        return typeMatch && filterMatch;
+    });
+
+    return (
+        <Card>
+            <CardHeader>
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center">
+                    <div>
+                        <CardTitle>Waterfall Chart</CardTitle>
+                        <CardDescription>
+                            A request-by-request visualization of the page load. <a href="#" className="text-primary hover:underline">Learn how to read a waterfall chart.</a>
+                        </CardDescription>
+                    </div>
+                    <div className="flex items-center gap-2 mt-2 sm:mt-0">
+                        <Button variant="outline" size="sm"><Expand className="h-4 w-4 mr-2" />Fullscreen</Button>
+                        <Button variant="default" size="sm"><Download className="h-4 w-4 mr-2" />Download HAR</Button>
+                    </div>
+                </div>
+            </CardHeader>
+            <CardContent>
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-4">
+                    <div className="relative w-full sm:w-64">
+                        <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                        <Input 
+                            placeholder="Filter requests..." 
+                            className="pl-8" 
+                            value={filter}
+                            onChange={(e) => setFilter(e.target.value)}
+                        />
+                    </div>
+                    <div className="flex flex-wrap gap-1">
+                        {resourceTypes.map(type => (
+                            <Button 
+                                key={type} 
+                                variant={activeType === type ? 'default' : 'outline'} 
+                                size="sm"
+                                onClick={() => setActiveType(type)}
+                            >
+                                {type}
+                            </Button>
+                        ))}
+                    </div>
+                </div>
+
+                <div className="border rounded-md overflow-hidden">
+                    <div className="overflow-x-auto">
+                        <Table className="min-w-[1200px]">
+                            <TableHeader>
+                                <TableRow>
+                                    <TableHead className="w-[400px]">URL</TableHead>
+                                    <TableHead className="w-[80px]">Status</TableHead>
+                                    <TableHead className="w-[200px]">Domain</TableHead>
+                                    <TableHead className="w-[100px]">Size</TableHead>
+                                    <TableHead>Timeline</TableHead>
+                                </TableRow>
+                            </TableHeader>
+                        </Table>
+                        <div className="h-[600px] overflow-y-auto">
+                           <Table className="min-w-[1200px]">
+                            <TableBody>
+                                {filteredData.map((item, index) => (
+                                    <TableRow key={index}>
+                                        <TableCell className="w-[400px] font-medium truncate">
+                                            <div className="flex items-center">
+                                                <ChevronRight className="h-4 w-4 mr-1 shrink-0" />
+                                                <TooltipProvider>
+                                                    <Tooltip>
+                                                        <TooltipTrigger asChild>
+                                                            <span className="truncate">{item.url}</span>
+                                                        </TooltipTrigger>
+                                                        <TooltipContent>
+                                                            <p>{item.url}</p>
+                                                        </TooltipContent>
+                                                    </Tooltip>
+                                                </TooltipProvider>
+                                            </div>
+                                        </TableCell>
+                                        <TableCell className="w-[80px]">
+                                            <span className={cn('px-2 py-1 text-xs rounded-full', item.status === 200 ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800')}>{item.status}</span>
+                                        </TableCell>
+                                        <TableCell className="w-[200px] truncate">{item.domain}</TableCell>
+                                        <TableCell className="w-[100px]">{item.size}</TableCell>
+                                        <TableCell>
+                                            <div className="w-full h-6 bg-muted rounded-sm overflow-hidden relative">
+                                                <div 
+                                                    className="h-full absolute"
+                                                    style={{ 
+                                                        left: `${(item.start / 1000) * 20}%`, 
+                                                        width: `${(item.time / 1000) * 20}%`,
+                                                        backgroundColor: resourceTypeColors[item.type as keyof typeof resourceTypeColors] || resourceTypeColors.default
+                                                     }}
+                                                ></div>
+                                                 <span className="absolute right-2 top-0.5 text-xs text-foreground z-10">{item.time}ms</span>
+                                            </div>
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                           </Table>
+                        </div>
+                    </div>
+                     <div className="flex justify-between items-center p-2 text-sm font-medium border-t bg-muted/50">
+                        <p>78 Requests</p>
+                        <p>24.5MB (25.1MB Uncompressed)</p>
+                        <p>Fully Loaded 4.4s (Onload 1.1s)</p>
+                    </div>
+                     <div className="h-[120px] p-4 border-t">
+                        <ResponsiveContainer width="100%" height="100%">
+                            <AreaChart data={summaryChartData} margin={{ top: 5, right: 20, left: -10, bottom: 5 }}>
+                                <defs>
+                                    <linearGradient id="colorCpu" x1="0" y1="0" x2="0" y2="1">
+                                    <stop offset="5%" stopColor="hsl(var(--destructive))" stopOpacity={0.8}/>
+                                    <stop offset="95%" stopColor="hsl(var(--destructive))" stopOpacity={0}/>
+                                    </linearGradient>
+                                    <linearGradient id="colorMemory" x1="0" y1="0" x2="0" y2="1">
+                                    <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.8}/>
+                                    <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0}/>
+                                    </linearGradient>
+                                </defs>
+                                <XAxis dataKey="name" stroke="hsl(var(--muted-foreground))" fontSize={12} tickLine={false} axisLine={false} />
+                                <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} tickLine={false} axisLine={false} />
+                                <Tooltip
+                                  contentStyle={{
+                                    backgroundColor: 'hsl(var(--background))',
+                                    borderColor: 'hsl(var(--border))'
+                                  }}
+                                />
+                                <Area type="monotone" dataKey="value" stroke="hsl(var(--destructive))" fillOpacity={1} fill="url(#colorCpu)" />
+                                <Area type="monotone" dataKey="value" stroke="hsl(var(--primary))" fillOpacity={1} fill="url(#colorMemory)" />
+                            </AreaChart>
+                        </ResponsiveContainer>
+                    </div>
+                </div>
+
+            </CardContent>
+        </Card>
+    );
+}
+
 function ResultsDisplay({ data }: { data: AnalysisResult }) {
     return (
         <div className="space-y-6">
@@ -326,10 +512,7 @@ function ResultsDisplay({ data }: { data: AnalysisResult }) {
                 </Card>
               </TabsContent>
               <TabsContent value="waterfall" className="pt-6">
-                <Card>
-                    <CardHeader><CardTitle>Waterfall</CardTitle></CardHeader>
-                    <CardContent><p>Waterfall details coming soon.</p></CardContent>
-                </Card>
+                <WaterfallTabContent />
               </TabsContent>
               <TabsContent value="optimization" className="pt-6">
                  <Card>
@@ -422,5 +605,3 @@ export default function ResultsPage() {
         </Suspense>
     )
 }
-
-    
