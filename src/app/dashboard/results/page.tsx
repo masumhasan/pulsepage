@@ -13,6 +13,7 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import ResultsLoading from './loading';
 import Image from 'next/image';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 function PerformanceScore({ score }: { score: number }) {
     const getScoreColor = (s: number) => {
@@ -173,21 +174,59 @@ function ResultsDisplay({ data }: { data: AnalysisResult }) {
                 </div>
                 <p className="text-muted-foreground break-all">For: <a href={data.url} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">{data.url}</a></p>
             </div>
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-                <PerformanceScore score={data.performanceScore} />
-                <WebVital title="Largest Contentful Paint" value={data.webVitals.lcp} Icon={Clock} />
-                <WebVital title="Cumulative Layout Shift" value={data.webVitals.cls} Icon={Shield} />
-                <WebVital title="Total Blocking Time" value={data.webVitals.tbt} Icon={FileText} />
-            </div>
-            <div className="grid gap-4 lg:grid-cols-2">
-                <UnusedCodeAnalysis unusedCode={data.unusedCode} />
-                <DetailedReport report={data.detailedReport} />
-            </div>
-             <div className="text-center pt-4">
-                <Link href="/dashboard/inspect">
-                    <Button>Analyze Another URL</Button>
-                </Link>
-            </div>
+            
+            <Tabs defaultValue="summary" className="w-full">
+              <TabsList>
+                <TabsTrigger value="summary">Summary</TabsTrigger>
+                <TabsTrigger value="performance">Performance</TabsTrigger>
+                <TabsTrigger value="structure">Structure</TabsTrigger>
+                <TabsTrigger value="waterfall">Waterfall</TabsTrigger>
+                <TabsTrigger value="optimization">Optimization</TabsTrigger>
+              </TabsList>
+              <TabsContent value="summary" className="pt-4">
+                <div className="space-y-6">
+                    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+                        <PerformanceScore score={data.performanceScore} />
+                        <WebVital title="Largest Contentful Paint" value={data.webVitals.lcp} Icon={Clock} />
+                        <WebVital title="Cumulative Layout Shift" value={data.webVitals.cls} Icon={Shield} />
+                        <WebVital title="Total Blocking Time" value={data.webVitals.tbt} Icon={FileText} />
+                    </div>
+                    <div className="grid gap-4 lg:grid-cols-2">
+                        <UnusedCodeAnalysis unusedCode={data.unusedCode} />
+                        <DetailedReport report={data.detailedReport} />
+                    </div>
+                     <div className="text-center pt-4">
+                        <Link href="/">
+                            <Button>Analyze Another URL</Button>
+                        </Link>
+                    </div>
+                </div>
+              </TabsContent>
+              <TabsContent value="performance">
+                <Card>
+                    <CardHeader><CardTitle>Performance</CardTitle></CardHeader>
+                    <CardContent><p>Performance details coming soon.</p></CardContent>
+                </Card>
+              </TabsContent>
+              <TabsContent value="structure">
+                <Card>
+                    <CardHeader><CardTitle>Structure</CardTitle></CardHeader>
+                    <CardContent><p>Structure details coming soon.</p></CardContent>
+                </Card>
+              </TabsContent>
+              <TabsContent value="waterfall">
+                <Card>
+                    <CardHeader><CardTitle>Waterfall</CardTitle></CardHeader>
+                    <CardContent><p>Waterfall details coming soon.</p></CardContent>
+                </Card>
+              </TabsContent>
+              <TabsContent value="optimization">
+                 <Card>
+                    <CardHeader><CardTitle>Optimization</CardTitle></CardHeader>
+                    <CardContent><p>Optimization details coming soon.</p></CardContent>
+                </Card>
+              </TabsContent>
+            </Tabs>
         </div>
     );
 }
@@ -240,7 +279,7 @@ function ResultsPageContent() {
                             <AlertTitle>Analysis Failed</AlertTitle>
                             <AlertDescription>{error}</AlertDescription>
                         </Alert>
-                        <Link href="/dashboard/inspect" className='mt-4 block'>
+                        <Link href="/" className='mt-4 block'>
                             <Button>Try Again</Button>
                         </Link>
                     </CardContent>
@@ -254,7 +293,7 @@ function ResultsPageContent() {
              <div className="flex flex-col items-center justify-center h-full text-center">
                  <Image src="https://fonts.gstatic.com/s/e/notoemoji/latest/1f937_200d_2642/512.webp" alt="Shrug" width={64} height={64} />
                 <p className='mt-4'>No results to display.</p>
-                 <Link href="/dashboard/inspect" className='mt-4 block'>
+                 <Link href="/" className='mt-4 block'>
                     <Button>Start New Analysis</Button>
                 </Link>
              </div>
