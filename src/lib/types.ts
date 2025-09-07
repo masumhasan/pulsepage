@@ -3,7 +3,7 @@ import type { DetailedReportOutput } from '@/ai/flows/detailed-optimization-repo
 
 export type WebVitals = {
   lcp: string;
-  cls: string;
+  cls: a;
   tbt: string;
 };
 
