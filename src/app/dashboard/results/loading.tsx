@@ -1,10 +1,30 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import Image from 'next/image';
 
+const analysisSteps = [
+    "Kicking off the analysis engines...",
+    "Fetching website data...",
+    "Running Lighthouse performance tests...",
+    "Analyzing page structure...",
+    "Detecting unused code...",
+    "Compiling your report...",
+];
+
 export default function ResultsLoading() {
+    const [currentStep, setCurrentStep] = useState(0);
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setCurrentStep((prevStep) => (prevStep + 1) % analysisSteps.length);
+        }, 2000); // Change step every 2 seconds
+
+        return () => clearInterval(interval);
+    }, []);
+
     return (
         <div className="space-y-6">
             <div className="flex items-center justify-center text-center p-8">
@@ -13,7 +33,7 @@ export default function ResultsLoading() {
                         <Image src="https://i.imgur.com/xFKPxya.gif" alt="Analyzing" width={64} height={64} className="animate-pulse" />
                     </div>
                     <h1 className="text-2xl font-bold">Analyzing your page...</h1>
-                    <p className="text-muted-foreground">This may take a moment. We're running a deep analysis.</p>
+                    <p className="text-muted-foreground min-h-[20px]">{analysisSteps[currentStep]}</p>
                 </div>
             </div>
 
